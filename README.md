@@ -51,7 +51,7 @@ Admin: `/admin`.
 
 ## Confidentiality
 
-Seller pages and seller emails do not mention funds or who would purchase after a contract is signed. The required disclosure appears in the footer, the terms, and the “Who closes?” answer:
+Seller pages and seller emails do not use the words “fund” or “assignment,” and they do not name who might later purchase. Georgia has no wholesaler-disclosure statute. The footer, the terms, and the “Who closes?” answer still include this sentence as our own practice:
 
 > We may purchase directly or partner with or assign our purchase contract to other buyers.
 

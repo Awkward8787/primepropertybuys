@@ -41,6 +41,7 @@ if (!defined('PPB_APP')) {
       <div class="field"><label for="contact_name">Contact</label><input id="contact_name" name="contact_name" required></div>
       <div class="field"><label for="email">Email</label><input id="email" name="email" type="email" required></div>
       <div class="field"><label for="phone">Phone</label><input id="phone" name="phone" required></div>
+      <div class="field"><label for="contact_role">Contact role</label><input id="contact_role" name="contact_role" placeholder="Acquisitions"></div>
       <div class="field"><label for="buyer_type">Type</label><select id="buyer_type" name="buyer_type"><?= options_html(buyer_type_options(), 'local') ?></select></div>
       <div class="field"><label for="tier">Tier</label><select id="tier" name="tier"><option value="A">A</option><option value="B">B</option><option value="C" selected>C</option></select></div>
     </div>

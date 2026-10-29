@@ -128,6 +128,7 @@ CREATE TABLE IF NOT EXISTS buyers (
   contact_name VARCHAR(150) NOT NULL,
   email VARCHAR(190) NOT NULL,
   phone VARCHAR(40) NOT NULL DEFAULT '',
+  contact_role VARCHAR(80) NOT NULL DEFAULT '',
   pof_on_file TINYINT(1) NOT NULL DEFAULT 0,
   pof_date DATE NULL,
   closings_count INT UNSIGNED NOT NULL DEFAULT 0,
@@ -152,6 +153,7 @@ CREATE TABLE IF NOT EXISTS buy_boxes (
   max_rehab INT UNSIGNED NULL,
   min_year INT UNSIGNED NULL,
   occupancy_ok VARCHAR(20) NOT NULL DEFAULT 'any',
+  close_speed VARCHAR(40) NOT NULL DEFAULT '',
   created_at DATETIME NOT NULL,
   PRIMARY KEY (id),
   KEY idx_boxes_buyer (buyer_id)

@@ -47,6 +47,9 @@ return [
         // Paste an https Calendly or Cal.com link when you choose a booking tool.
         'booking_url' => '',
         'booking_label' => '[BOOKING TOOL]',
+        // Shown on the About page until a real, permitted quote or count replaces them.
+        'testimonial' => '[TESTIMONIAL — add when real]',
+        'deals_closed' => '[DEALS CLOSED — add when real]',
         // Physical address for buyer-list emails. Leave the placeholder until you have one.
         'mailing_address' => '[MAILING ADDRESS]',
         'city' => 'Valdosta',

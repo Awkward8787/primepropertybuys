@@ -18,6 +18,7 @@ if (!defined('PPB_APP')) {
     <div class="field"><label for="contact_name">Contact</label><input id="contact_name" name="contact_name" required value="<?= e((string) $buyer['contact_name']) ?>"></div>
     <div class="field"><label for="email">Email</label><input id="email" name="email" type="email" required value="<?= e((string) $buyer['email']) ?>"></div>
     <div class="field"><label for="phone">Phone</label><input id="phone" name="phone" required value="<?= e((string) $buyer['phone']) ?>"></div>
+    <div class="field"><label for="contact_role">Contact role</label><input id="contact_role" name="contact_role" value="<?= e((string) ($buyer['contact_role'] ?? '')) ?>"></div>
     <div class="field"><label for="buyer_type">Type</label><select id="buyer_type" name="buyer_type"><?= options_html(buyer_type_options(), (string) $buyer['buyer_type']) ?></select></div>
     <div class="field"><label for="tier">Tier</label>
       <select id="tier" name="tier">
@@ -56,7 +57,11 @@ if (!defined('PPB_APP')) {
       <p><?= e((string) $box['areas']) ?> · <?= e((string) $box['property_types']) ?>
         <?php if ($box['price_min'] !== null): ?> · <?= e(format_money((int) $box['price_min'])) ?>–<?= e(format_money((int) ($box['price_max'] ?? 0))) ?><?php endif; ?>
         <?php if ($box['min_beds'] !== null): ?> · <?= (int) $box['min_beds'] ?>+ beds<?php endif; ?>
-        · occupancy <?= e((string) $box['occupancy_ok']) ?></p>
+        <?php if ($box['min_baths'] !== null): ?> · <?= (int) $box['min_baths'] ?>+ baths<?php endif; ?>
+        <?php if ($box['max_rehab'] !== null): ?> · rehab to <?= e(format_money((int) $box['max_rehab'])) ?><?php endif; ?>
+        <?php if ($box['min_year'] !== null): ?> · built <?= (int) $box['min_year'] ?>+<?php endif; ?>
+        · occupancy <?= e((string) $box['occupancy_ok']) ?>
+        <?php if (($box['close_speed'] ?? '') !== ''): ?> · close <?= e((string) $box['close_speed']) ?><?php endif; ?></p>
       <form method="post" action="/admin/buyers/<?= (int) $buyer['id'] ?>">
         <?= csrf_field() ?>
         <input type="hidden" name="action" value="delete_box">
@@ -73,6 +78,18 @@ if (!defined('PPB_APP')) {
       <div class="field"><label for="box_min">Price min</label><input id="box_min" name="price_min"></div>
       <div class="field"><label for="box_max">Price max</label><input id="box_max" name="price_max"></div>
       <div class="field"><label for="box_beds">Min beds</label><input id="box_beds" name="min_beds"></div>
+      <div class="field"><label for="min_baths">Min baths</label><input id="min_baths" name="min_baths"></div>
+      <div class="field"><label for="max_rehab">Max rehab</label><input id="max_rehab" name="max_rehab"></div>
+      <div class="field"><label for="min_year">Year built, minimum</label><input id="min_year" name="min_year"></div>
+      <div class="field"><label for="close_speed">Close speed</label>
+        <select id="close_speed" name="close_speed">
+          <option value="">Any</option>
+          <option value="7">About 7 days</option>
+          <option value="14">About 14 days</option>
+          <option value="30">About 30 days</option>
+          <option value="flexible">Flexible</option>
+        </select>
+      </div>
       <div class="field"><label for="property_types">Property types</label><input id="property_types" name="property_types" placeholder="Single-family, multifamily"></div>
       <div class="field"><label for="occupancy_ok">Occupancy</label>
         <select id="occupancy_ok" name="occupancy_ok">

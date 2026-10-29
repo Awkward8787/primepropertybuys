@@ -853,6 +853,7 @@ function buyer_from_post(array $post, bool $admin): array
             'contact_name' => $contact,
             'email' => $email,
             'phone' => $phone,
+            'contact_role' => clean_line((string) ($post['contact_role'] ?? ''), 80),
             'pof_on_file' => $pof,
             'pof_date' => $pofDate,
             'closings_count' => $closings,
@@ -869,6 +870,7 @@ function buyer_from_post(array $post, bool $admin): array
             'max_rehab' => null,
             'min_year' => null,
             'occupancy_ok' => 'any',
+            'close_speed' => '',
         ],
     ];
 }
@@ -1330,16 +1332,32 @@ function handle_buyer_post(int $id): void
             redirect('/admin/buyers/' . $id);
         }
         $beds = trim((string) ($_POST['min_beds'] ?? ''));
+        $baths = trim((string) ($_POST['min_baths'] ?? ''));
+        $year = trim((string) ($_POST['min_year'] ?? ''));
+        [$rehab, $rehabError] = parse_optional_money((string) ($_POST['max_rehab'] ?? ''));
+        if ($rehabError) {
+            flash_set('err', $rehabError);
+            redirect('/admin/buyers/' . $id);
+        }
+        if ($year !== '' && preg_match('/^(18|19|20)\d{2}$/', $year) !== 1) {
+            flash_set('err', 'Year built should be a four-digit year, or blank.');
+            redirect('/admin/buyers/' . $id);
+        }
+        $speed = (string) ($_POST['close_speed'] ?? '');
+        if (!in_array($speed, ['', '7', '14', '30', 'flexible'], true)) {
+            $speed = '';
+        }
         insert_box($id, [
             'areas' => $areas,
             'property_types' => clean_line((string) ($_POST['property_types'] ?? ''), 255),
             'min_beds' => preg_match('/^\d{1,2}$/', $beds) ? (int) $beds : null,
-            'min_baths' => null,
+            'min_baths' => preg_match('/^\d{1,2}$/', $baths) ? (int) $baths : null,
             'price_min' => $min,
             'price_max' => $max,
-            'max_rehab' => null,
-            'min_year' => null,
+            'max_rehab' => $rehab,
+            'min_year' => $year === '' ? null : (int) $year,
             'occupancy_ok' => in_array(($_POST['occupancy_ok'] ?? 'any'), ['any', 'vacant', 'occupied'], true) ? (string) $_POST['occupancy_ok'] : 'any',
+            'close_speed' => $speed,
         ]);
         flash_set('ok', 'Buy box added.');
         redirect('/admin/buyers/' . $id);

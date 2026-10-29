@@ -15,6 +15,11 @@ $phone = contact_phone();
     <h2>Contact</h2>
     <p>Email <a href="mailto:<?= e((string) ppb('business.email')) ?>"><?= e((string) ppb('business.email')) ?></a></p>
     <p>Phone: <?php if ($phone['callable']): ?><a href="tel:<?= e($phone['tel']) ?>"><?= e($phone['display']) ?></a><?php else: ?><span class="placeholder"><?= e($phone['display'] !== '' ? $phone['display'] : '(TBD)') ?></span><?php endif; ?></p>
-    <p>We do not publish reviews, star ratings, purchase counts, or years in business on this site. Those lines stay off the page until there is a documented fact to put there.</p>
+    <h2>Not published yet</h2>
+    <p>These lines are placeholders. They are not reviews, ratings, or counts.</p>
+    <ul>
+      <li><span class="placeholder"><?= e((string) ppb('business.testimonial', '[TESTIMONIAL — add when real]')) ?></span></li>
+      <li><span class="placeholder"><?= e((string) ppb('business.deals_closed', '[DEALS CLOSED — add when real]')) ?></span></li>
+    </ul>
   </div>
 </section>

@@ -58,6 +58,35 @@ function ensure_schema(PDO $pdo): void
     foreach (schema_statements(db_driver()) as $sql) {
         $pdo->exec($sql);
     }
+    ensure_added_columns($pdo);
+}
+
+function ensure_added_columns(PDO $pdo): void
+{
+    $columns = [
+        'buyers' => ['contact_role' => 'TEXT'],
+        'buy_boxes' => ['close_speed' => 'TEXT'],
+    ];
+    foreach ($columns as $table => $defs) {
+        $existing = [];
+        if (db_driver() === 'sqlite') {
+            foreach ($pdo->query('PRAGMA table_info(' . $table . ')')->fetchAll() as $col) {
+                $existing[(string) $col['name']] = true;
+            }
+        } else {
+            $stmt = $pdo->prepare('SELECT COLUMN_NAME FROM information_schema.COLUMNS WHERE TABLE_SCHEMA = DATABASE() AND TABLE_NAME = ?');
+            $stmt->execute([$table]);
+            foreach ($stmt->fetchAll() as $col) {
+                $existing[(string) $col['COLUMN_NAME']] = true;
+            }
+        }
+        foreach ($defs as $name => $type) {
+            if (isset($existing[$name])) {
+                continue;
+            }
+            $pdo->exec('ALTER TABLE ' . $table . ' ADD COLUMN ' . $name . ' ' . $type);
+        }
+    }
 }
 
 function schema_statements(string $driver): array
@@ -197,6 +226,7 @@ function sqlite_schema_statements(): array
             contact_name TEXT NOT NULL,
             email TEXT NOT NULL,
             phone TEXT NOT NULL DEFAULT \'\',
+            contact_role TEXT NOT NULL DEFAULT \'\',
             pof_on_file INTEGER NOT NULL DEFAULT 0,
             pof_date TEXT,
             closings_count INTEGER NOT NULL DEFAULT 0,
@@ -219,6 +249,7 @@ function sqlite_schema_statements(): array
             max_rehab INTEGER,
             min_year INTEGER,
             occupancy_ok TEXT NOT NULL DEFAULT \'any\',
+            close_speed TEXT NOT NULL DEFAULT \'\',
             created_at TEXT NOT NULL
         )',
         'CREATE INDEX IF NOT EXISTS idx_boxes_buyer ON buy_boxes (buyer_id)',

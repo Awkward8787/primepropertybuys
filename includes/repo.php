@@ -258,11 +258,12 @@ function insert_buyer(array $row): int
 {
     $now = now_sql();
     db()->prepare('INSERT INTO buyers (
-        company, buyer_type, tier, contact_name, email, phone, pof_on_file, pof_date, closings_count,
+        company, buyer_type, tier, contact_name, email, phone, contact_role, pof_on_file, pof_date, closings_count,
         email_opt_in, notes, created_at, updated_at
-    ) VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?)')->execute([
+    ) VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?)')->execute([
         $row['company'], $row['buyer_type'], $row['tier'], $row['contact_name'], $row['email'], $row['phone'],
-        $row['pof_on_file'], $row['pof_date'], $row['closings_count'], $row['email_opt_in'], $row['notes'], $now, $now,
+        $row['contact_role'] ?? '', $row['pof_on_file'], $row['pof_date'], $row['closings_count'], $row['email_opt_in'],
+        $row['notes'], $now, $now,
     ]);
     return (int) db()->lastInsertId();
 }
@@ -270,10 +271,11 @@ function insert_buyer(array $row): int
 function update_buyer(int $id, array $row): void
 {
     db()->prepare('UPDATE buyers SET company = ?, buyer_type = ?, tier = ?, contact_name = ?, email = ?, phone = ?,
-        pof_on_file = ?, pof_date = ?, closings_count = ?, email_opt_in = ?, notes = ?, updated_at = ? WHERE id = ?')
+        contact_role = ?, pof_on_file = ?, pof_date = ?, closings_count = ?, email_opt_in = ?, notes = ?, updated_at = ? WHERE id = ?')
         ->execute([
             $row['company'], $row['buyer_type'], $row['tier'], $row['contact_name'], $row['email'], $row['phone'],
-            $row['pof_on_file'], $row['pof_date'], $row['closings_count'], $row['email_opt_in'], $row['notes'], now_sql(), $id,
+            $row['contact_role'] ?? '', $row['pof_on_file'], $row['pof_date'], $row['closings_count'], $row['email_opt_in'],
+            $row['notes'], now_sql(), $id,
         ]);
 }
 
@@ -307,10 +309,11 @@ function unsubscribe_buyer(string $email): void
 function insert_box(int $buyerId, array $box): void
 {
     db()->prepare('INSERT INTO buy_boxes (
-        buyer_id, areas, property_types, min_beds, min_baths, price_min, price_max, max_rehab, min_year, occupancy_ok, created_at
-    ) VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?)')->execute([
+        buyer_id, areas, property_types, min_beds, min_baths, price_min, price_max, max_rehab, min_year, occupancy_ok, close_speed, created_at
+    ) VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?)')->execute([
         $buyerId, $box['areas'], $box['property_types'], $box['min_beds'], $box['min_baths'],
-        $box['price_min'], $box['price_max'], $box['max_rehab'], $box['min_year'], $box['occupancy_ok'], now_sql(),
+        $box['price_min'], $box['price_max'], $box['max_rehab'], $box['min_year'], $box['occupancy_ok'],
+        $box['close_speed'] ?? '', now_sql(),
     ]);
 }
 

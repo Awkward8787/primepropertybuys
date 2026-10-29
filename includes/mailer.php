@@ -67,32 +67,17 @@ function seller_booking_line(): string
  *
  * @return array{subject: string, body: string}
  */
+function render_email(string $template, array $vars): string
+{
+    extract($vars, EXTR_SKIP);
+    ob_start();
+    include dirname(__DIR__) . '/templates/emails/' . $template . '.php';
+    return trim((string) ob_get_clean());
+}
+
 function seller_message(string $kind, array $lead): array
 {
-    $address = (string) ($lead['address'] ?? '');
-    $name = (string) ($lead['full_name'] ?? '');
-    $email = (string) ppb('business.email', 'info@primepropertybuys.com');
-    $consented = (int) ($lead['tcpa_consent'] ?? 0) === 1;
-    $contact = $consented
-        ? 'You agreed we may call or text you at ' . ($lead['phone'] ?? '') . ' about this request.'
-        : 'You did not agree to calls or texts, so we will use email only.';
-
-    $intro = match ($kind) {
-        'walkthrough' => "We can walk through the house.\n\n" . seller_booking_line(),
-        'offer' => 'A written cash offer is ready. We will send the number by email. You are not obligated to accept it.',
-        'under_contract' => 'Your file is under contract. A closing attorney or title company will be in touch about the paperwork and the date.',
-        'closing' => 'A closing date is on the calendar. The closing attorney or title company will confirm what you need to sign.',
-        'closed' => 'Thank you. The closing is complete. If something still needs attention, email us.',
-        'reviewing' => 'We are reviewing the property details you sent.',
-        default => "We received your request for a cash offer.\n\nProperty: {$address}\nName: {$name}\n\nWe will review it and reply by email.\n{$contact}\n\n" . seller_booking_line(),
-    };
-
-    $body = implode("\n\n", [
-        $intro,
-        'You do not have to make repairs for us to look at the house, and asking for an offer does not commit you to sell.',
-        'If you did not ask us to contact you, ignore this email or write to ' . $email . '.',
-        seller_mail_footer(),
-    ]);
+    $body = render_email('seller/message', ['kind' => $kind, 'lead' => $lead]);
 
     $subjects = [
         'received' => 'We received your property request',
@@ -145,35 +130,9 @@ function deliver_seller_notice(array $lead, string $kind = 'received'): void
  */
 function buyer_blast_message(array $buyer, array $sheet): array
 {
-    $email = (string) ($buyer['email'] ?? '');
-    $token = unsub_token($email);
-    $link = absolute_url('/d/' . $sheet['token']);
-    $unsub = absolute_url('/investors/unsubscribe?e=' . rawurlencode($email) . '&t=' . $token);
-    $address = (string) ppb('business.mailing_address', '[MAILING ADDRESS]');
-    $lines = [
-        'A property matching details you sent us is available to review.',
-        '',
-        'Location: ' . $sheet['location_label'],
-        'Price: ' . ($sheet['price_text'] !== '' ? $sheet['price_text'] : 'See the sheet'),
-        'ARV: ' . ($sheet['arv_text'] !== '' ? $sheet['arv_text'] : '—'),
-        'Rehab estimate: ' . ($sheet['rehab_text'] !== '' ? $sheet['rehab_text'] : '—'),
-        'Deadline: ' . ($sheet['deadline_text'] !== '' ? $sheet['deadline_text'] : '—'),
-        '',
-        'Private sheet: ' . $link,
-        '',
-        'We may not own this property. Confirm availability before you rely on it.',
-        'This note does not obligate you to purchase.',
-        '',
-        (string) ppb('business.name', 'Prime Property Buys') . ' – Acquisitions',
-        $address,
-        (string) ppb('business.email', 'info@primepropertybuys.com'),
-        '',
-        'You are receiving this because you asked for property emails.',
-        'Unsubscribe: ' . $unsub,
-    ];
     return [
         'subject' => 'Property to review: ' . mail_subject_piece((string) $sheet['location_label']),
-        'body' => implode("\n", $lines),
+        'body' => render_email('buyer/blast', ['buyer' => $buyer, 'sheet' => $sheet]),
     ];
 }
 
@@ -196,18 +155,7 @@ function deliver_buyer_blast(array $buyer, array $sheet): bool
 
 function deliver_buyer_signup_mail(array $buyer): void
 {
-    $body = implode("\n\n", [
-        'We received your buy box.',
-        'Company: ' . ($buyer['company'] ?? ''),
-        'Areas: ' . ($buyer['areas'] ?? ''),
-        (int) ($buyer['email_opt_in'] ?? 0) === 1
-            ? 'You asked to be emailed when a property matches.'
-            : 'You did not opt in to property emails, so we will not add you to those messages.',
-        (int) ($buyer['tcpa_consent'] ?? 0) === 1
-            ? 'You agreed we may call or text you about matching properties.'
-            : 'You did not agree to calls or texts.',
-        seller_mail_footer(),
-    ]);
+    $body = render_email('buyer/signup', ['buyer' => $buyer]);
     send_plain_mail((string) $buyer['email'], 'We received your buy box', $body, 'Prime Property Buys – Acquisitions');
     $notify = (string) ppb('business.notification_email', '');
     if ($notify === '') {

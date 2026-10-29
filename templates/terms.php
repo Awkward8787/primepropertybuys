@@ -12,7 +12,7 @@ $email = (string) ppb('business.email');
     <p>Effective October 28, 2026. These terms cover use of this website. They are not a substitute for advice from your own attorney.</p>
     <h2>How a purchase can close</h2>
     <p><?= e(disclosure_line()) ?></p>
-    <p>Any purchase is only in a written contract you choose to sign. Requesting an offer on this website does not obligate you or us. <?= e(brokerage_disclosure()) ?></p>
+    <p>We include that sentence as our own practice, on this page and in the footer. It is not a claim that Georgia has a statute requiring a particular disclosure. Any purchase is only in a written contract you choose to sign. Requesting an offer on this website does not obligate you or us. <?= e(brokerage_disclosure()) ?></p>
     <h2>Offers</h2>
     <p>An offer is not an appraisal and not a promise of a particular price or closing date. A cash price is often below a retail asking price. Read the contract before you sign, and ask a Georgia closing attorney if you want independent advice.</p>
     <h2>Your submissions</h2>
