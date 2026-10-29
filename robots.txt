@@ -1,0 +1,11 @@
+User-agent: *
+Allow: /
+
+Disallow: /admin
+Disallow: /admin/
+Disallow: /investors
+Disallow: /investors/
+Disallow: /d/
+Disallow: /request-received
+
+Sitemap: https://primepropertybuys.com/sitemap.xml
